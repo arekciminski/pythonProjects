@@ -123,3 +123,32 @@ def reshape_image(img,scale_percent):
 
     # resize image
     return cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+def prepare_data(NUMBER_OF_TRAIN_IMAGES,NUMBER_OF_VAL_IMAGES,scale_percent):
+  x_train = []
+  y_train = []
+  i = 0
+  for (index, image), label in zip(classification_dataset.df.iterrows(), classification_dataset.df[['image_id','Male']].values):
+    if image['partition'] == 0:
+      i = i +1
+      resized_image = reshape_image(cv2.imread(classification_dataset.images_path + image['image_id']), scale_percent)
+      x_train.append(resized_image)
+      y_train.append(label[1])
+    if i == NUMBER_OF_TRAIN_IMAGES:
+      break
+
+  x_size = resized_image.shape[0]
+  y_size = resized_image.shape[1]
+
+  x_val = []
+  y_val = []
+  i = NUMBER_OF_TRAIN_IMAGES
+  for (index, image), label in zip(classification_dataset.df.iterrows(), classification_dataset.df[['image_id','Male']].values):
+    if image['partition'] == 1:
+      i = i +1
+      resized_image = reshape_image(cv2.imread(classification_dataset.images_path + image['image_id']), scale_percent)
+      x_val.append(resized_image)
+      y_val.append(label[1])
+    if i == NUMBER_OF_TRAIN_IMAGES+NUMBER_OF_VAL_IMAGES:
+      break
+  return x_train,y_train, x_val,y_val,x_size,y_size
